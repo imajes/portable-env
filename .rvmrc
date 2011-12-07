@@ -1,4 +1,8 @@
-export rvm_path="~/.rvm"
+if [ -s ~/.rvm/scripts/rvm ] ; then
+  export rvm_path="~/.rvm"
+else
+  export rvm_path="/usr/local/rvm"
+fi
 rvm_archflags="-arch x86_64"
 rvm_project_rvmrc_default=1
 rvm_project_rvmrc=1
