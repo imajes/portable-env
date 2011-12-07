@@ -1,0 +1,12 @@
+fine.
+
+this is to get over a hump and it's a bunch of dotfile stuff that makes things
+clean enough to start with. But it's not what i really need in the longer
+term, which is more eloquently demonstrated here:
+
+https://github.com/holman/dotfiles
+
+This repo will be more like that, at some point.
+
+
+# vim: set et ts=2 sw=2 tw=78 ft=markdown :
