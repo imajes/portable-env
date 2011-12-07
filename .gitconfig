@@ -80,7 +80,7 @@
 				untracked = cyan
 
 [core]
-				excludesfile = ~/.gitignore
+				excludesfile = ~/.gitignore-global
 				quotepath = false
 
 [merge "gemfilelock"]
