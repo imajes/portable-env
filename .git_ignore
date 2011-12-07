@@ -1,4 +1,14 @@
-.zsh_history
-.zcompdump
+# third partied
 .rvm
 .gem
+
+# don't track this!
+.ssh
+
+# histories
+.*-history
+.*_history
+.lesshst
+
+# caches
+.zcompdump
