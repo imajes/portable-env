@@ -1,0 +1,104 @@
+[user]
+				email = james@imaj.es
+				name = James Cox
+
+[help]
+				autocorrect = 1
+
+[alias]
+				co = checkout
+				cp = cherry-pick
+				ci = commit
+				st = status
+				br = branch
+				mg = merge
+				sw = checkout
+				switch = checkout
+				retrack = "!retrack() { git config \"branch.$1.remote\" $(dirname \"$2\"); git config \"branch.$1.merge\" \"refs/heads/$(basename \"$2\")\"; }; retrack"
+				lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+				land = !sh -c 'git merge --no-ff $1 -m \"$2\" && git branch -d $1' -
+				authors = !sh -c 'git log |egrep ^Author|sort|uniq -c|sort'
+
+[pack]
+				threads = 0
+
+[push]
+				default = tracking
+
+[apply]
+				whitespace = nowarn
+
+[mirror]
+				summary = true
+
+[svn]
+				authorsfile = /Users/james/.git-authors
+
+[apply]
+				whitespace = strip
+
+[diff]
+				color = auto
+				rename = copy
+				tool = Kaleidoscope
+
+[difftool "Kaleidoscope"]
+				cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
+
+[difftool]
+				prompt = false
+
+[pager]
+				color = true
+
+[status]
+				color = auto
+
+[color]
+				branch = auto
+				diff = auto
+				status = auto
+				interactive = auto
+
+[format]
+				numbered = auto
+
+[color "branch"]
+				current = yellow reverse
+				local = yellow
+				remote = green
+
+[color "diff"]
+				meta = yellow bold
+				frag = magenta bold
+				old = red bold
+				new = green bold
+
+[color "status"]
+				added = yellow
+				changed = green
+				untracked = cyan
+
+[core]
+				excludesfile = ~/.gitignore
+				quotepath = false
+
+[github]
+				user = imajes
+				token = 2fc161b0a462fcf364203f8469aa9722
+
+[merge "gemfilelock"]
+				name = relocks the gemfile.lock
+				driver = bundle lock
+
+[merge "railsschema"]
+				name = newer Rails schema version
+				driver = "ruby -e '\n\
+								system %(git), %(merge-file), %(--marker-size=%L), %(%A), %(%O), %(%B)\n\
+								b = File.read(%(%A))\n\
+								b.sub!(/^<+ .*\\nActiveRecord::Schema\\.define.:version => (\\d+). do\\n=+\\nActiveRecord::Schema\\.define.:version => (\\d+). do\\n>+ .*/) do\n\
+								%(ActiveRecord::Schema.define(:version => #{[$1, $2].max}) do)\n\
+								end\n\
+								File.open(%(%A), %(w)) {|f| f.write(b)}\n\
+								exit 1 if b.include?(%(<)*%L)'"
+
