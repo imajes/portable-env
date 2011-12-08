@@ -4,3 +4,9 @@
 [submodule ".zsh/oh-my-zsh"]
 	path = .zsh/oh-my-zsh
 	url = https://github.com/imajes/oh-my-zsh
+[submodule ".rbenv/plugins/rbenv-vars"]
+	path = .rbenv/plugins/rbenv-vars
+	url = https://github.com/sstephenson/rbenv-vars.git
+[submodule ".rbenv/plugins/rbenv-bundler"]
+	path = .rbenv/plugins/rbenv-bundler
+	url = https://github.com/carsomyr/rbenv-bundler.git
