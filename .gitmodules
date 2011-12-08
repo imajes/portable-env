@@ -4,3 +4,6 @@
 [submodule ".zsh/oh-my-zsh"]
 	path = .zsh/oh-my-zsh
 	url = https://github.com/imajes/oh-my-zsh
+[submodule ".rbenv"]
+	path = .rbenv
+	url = https://github.com/sstephenson/rbenv
