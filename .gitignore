@@ -17,4 +17,4 @@
 # now, ignore things that are real files, 
 # because they'll probably never be part of the repo
 #
-[A-Za-z]*
+[0-9A-Za-z]*
