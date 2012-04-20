@@ -3,10 +3,19 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
 print=""
-if [ "$1" = "-" ]; then
-  print=1
-  shift
-fi
+no_rehash=""
+for args in "$@"
+do
+  if [ "$args" = "-" ]; then
+    print=1
+		shift
+  fi
+
+  if [ "$args" = "--no-rehash" ]; then
+    no_rehash=1
+    shift
+  fi
+done
 
 shell="$1"
 if [ -z "$shell" ]; then
@@ -41,6 +50,9 @@ if [ -z "$print" ]; then
   zsh )
     profile='~/.zshrc'
     ;;
+  ksh )
+    profile='~/.profile'
+    ;;
   * )
     profile='your profile'
     ;;
@@ -66,13 +78,15 @@ bash | zsh )
   ;;
 esac
 
-echo 'rbenv rehash 2>/dev/null'
+if [ -z "$no_rehash" ]; then
+  echo 'rbenv rehash 2>/dev/null'
+fi
 
 commands=(`rbenv commands --sh`)
 IFS="|"
 cat <<EOS
-function rbenv() {
-  command="\$1"
+rbenv() {
+  local command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
   fi

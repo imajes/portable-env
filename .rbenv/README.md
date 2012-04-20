@@ -4,7 +4,7 @@ rbenv lets you easily switch between multiple versions of Ruby. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
 tools that do one thing well.
 
-<img src="http://i.sstephenson.us/rbenv.png" width="894" height="464">
+<img src="http://i.sstephenson.us/rbenv2.png" width="894" height="464">
 
 ### rbenv _does…_
 
@@ -100,13 +100,13 @@ easy to fork and contribute any changes back upstream.
 
         $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
 
-    **Zsh note**: Modifiy your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
 3. Add rbenv init to your shell to enable shims and autocompletion.
 
         $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 
-    **Zsh note**: Modifiy your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
 4. Restart your shell so the path changes take effect. You can now
    begin using rbenv.
@@ -313,6 +313,24 @@ Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/sstephenson/rbenv/issues).
 
 ### <a name="section_4.1"></a> 4.1 Version History
+
+**0.3.0** (December 25, 2011)
+
+* Added an `rbenv root` command which prints the value of
+  `$RBENV_ROOT`, or the default root directory if it's unset.
+* Clarified Zsh installation instructions in the readme.
+* Removed some redundant code in `rbenv rehash`.
+* Fixed an issue with calling `readlink` for paths with spaces.
+* Changed Zsh initialization code to install completion hooks only for
+  interactive shells.
+* Added preliminary support for ksh.
+* `rbenv rehash` creates or removes shims only when necessary instead
+  of removing and re-creating all shims on each invocation.
+* Fixed that `RBENV_DIR`, when specified, would be incorrectly
+  expanded to its parent directory.
+* Removed the deprecated `set-default` and `set-local` commands.
+* Added a `--no-rehash` option to `rbenv init` for skipping the
+  automatic rehash when opening a new shell.
 
 **0.2.1** (October 1, 2011)
 
