@@ -1,6 +1,7 @@
 # third partied
 .rvm
 .gem
+.rbenv
 
 # don't track this!
 .ssh
