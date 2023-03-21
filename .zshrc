@@ -19,7 +19,6 @@ autoload -Uz add-zsh-hook
 source $ZSH_CUSTOM/plugins/evalcache/evalcache.plugin.zsh
 
 plugins=(
-  1password
   ansible
   aws
   colorize
@@ -46,6 +45,8 @@ export NVIM_RUBY_LOG_LEVEL=debug
 alias python=python3
 
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+alias ss='sudo su -'
 
 _evalcache direnv hook zsh
 
