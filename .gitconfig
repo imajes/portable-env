@@ -142,3 +142,6 @@
 [grep]
   extendRegexp = true
   lineNumber = true
+
+[pull]
+  rebase = true
