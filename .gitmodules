@@ -10,3 +10,6 @@
 [submodule ".extras/zsh-histdb"]
 	path = .extras/zsh-histdb
 	url = https://github.com/larkery/zsh-histdb
+[submodule ".pyenv"]
+	path = .pyenv
+	url = https://github.com/pyenv/pyenv.git
