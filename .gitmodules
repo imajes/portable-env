@@ -4,3 +4,9 @@
 [submodule ".oh-my-zsh"]
 	path = .oh-my-zsh
 	url = https://github.com/ohmyzsh/ohmyzsh.git
+[submodule ".extras/evalcache"]
+	path = .extras/evalcache
+	url = https://github.com/mroth/evalcache
+[submodule ".extras/zsh-histdb"]
+	path = .extras/zsh-histdb
+	url = https://github.com/larkery/zsh-histdb
