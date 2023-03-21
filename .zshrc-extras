@@ -1,0 +1,56 @@
+
+# editor, stuff here should move into ohmyzshcode
+export EDITOR=nvim
+
+export PATH="$HOME/bin:$PATH"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# . "/Users/james/.acme.sh/acme.sh.env"
+
+export PRY_HISTFILE=.pry_history
+
+# # make ruby quieter rn
+# export RUBYOPT='-W0 -W:no-deprecated -W:no-experimental'
+
+alias spacecop='rubocop -A --only Style/FrozenStringLiteralComment,Layout/EmptyLines,Style/StringLiterals,Layout/EmptyLinesAroundBlockBody,Layout/EmptyLineAfterMagicComment,Layout/EmptyLinesAroundClassBody,Layout/TrailingWhitespace,Layout/EmptyLinesAroundBlockBody,Layout/EmptyLinesAroundModuleBody,Layout/EmptyLinesAroundMethodBody,Layout/SpaceAroundOperators,Layout/TrailingEmptyLines,Layout/SpaceInsideHashLiteralBraces,Layout/EmptyLineAfterGuardClause,Layout/FirstHashElementIndentation,Layout/EmptyLines,Layout/SpaceAfterComma,Layout/HashAlignment'
+
+## go things
+
+export GOPATH=~/src/go
+export GOBIN=$GOPATH/bin
+export GO15VENDOREXPERIMENT=1
+export PATH=$GOPATH/bin:$PATH
+
+export ES_HEAP_SIZE=32m
+export ES_JAVA_OPTS=-server
+export ES_DIRECT_SIZE=32m
+export MAX_LOCKED_MEMORY=32m
+
+export DISABLE_SPRING=true
+#
+### Added by the Heroku Toolbelt
+# export PATH="~/.composer/vendor/bin:$PATH"
+# export PATH="/usr/local/heroku/bin:$PATH"
+
+## homebrew python libexecs
+# export PATH="/usr/local/opt/python/libexec/bin:$PATH"
+export PYTHON_EXECUTABLE=/opt/homebrew/bin/python3
+
+# somehow this isn't getting set for brew?
+export GIT_EXECUTABLE=/opt/homebrew/bin/git
+
+# alternative to ls for beautifulness
+alias ls='exa -lhgbH'
+alias ll='ls'
+alias l='ls'
+
+## another env tool
+export PATH="$HOME/.pyenv/bin:$PATH"
+_evalcache pyenv init -
+
+## goes last to ensure it is the first part of path
+export PATH="$HOME/.rbenv/bin:$PATH"
+_evalcache rbenv init -

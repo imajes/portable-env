@@ -1,81 +1,144 @@
-[help]
-				autocorrect = 1
-
-[alias]
-				co = checkout
-				cp = cherry-pick
-				ci = commit
-				st = status -sb
-				br = branch
-				branch-detail = branch -r -v --no-merged
-				mg = merge
-				sw = checkout
-				switch = checkout
-				cloen = clone
-				lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
-				lg1 = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
-				lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
-				authors = shortlog -sne
-
-[stash]
-				include-untracked = true
-
-[pack]
-				threads = 0
-
-[push]
-				default = simple
-
-[apply]
-				whitespace = nowarn
-
-[mirror]
-				summary = true
-
-[apply]
-				whitespace = strip
-
-[diff]
-				color = auto
-				rename = copy
-
-[pager]
-				color = true
-
-[status]
-				color = auto
-
-[color]
-				branch = auto
-				diff = auto
-				status = auto
-				interactive = auto
-				ui = 1
-
-[format]
-				numbered = auto
-
-[color "branch"]
-				current = yellow reverse
-				local = yellow
-				remote = green
-
-[color "diff"]
-				meta = yellow bold
-				frag = magenta bold
-				old = red bold
-				new = green bold
-
-[color "status"]
-				added = yellow
-				changed = green
-				untracked = cyan
+[user]
+  email = james@imaj.es
+  name = James Cox
+  signingkey = D80F4598CB239FD6
 
 [core]
-				excludesfile = ~/.gitignore_global
-				quotepath = false
+  excludesfile = /Users/james/.gitignore_global
+  quotepath = false
+  attributesfile = /Users/james/.gitattributes
+  pager = delta
+
+[github]
+  user = imajes
+
+[help]
+  autocorrect = 1
+
+[alias]
+  deepsearch = log --source --all -S
+  npr = pull-request -po
+  co = checkout
+  cp = cherry-pick
+  ci = commit
+  st = status -sb
+  br = branch
+  branch-detail = branch -r -v --no-merged
+  mg = merge
+  sw = checkout
+  switch = checkout
+  cloen = clone
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  lg1 = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
+  authors = shortlog -sne
+  renameTag = "!sh -c 'set -e;git tag $2 $1; git tag -d $1;git push origin :refs/tags/$1;git push --tags' -"
+  recent = "!git branch --color=always --sort=-committerdate --format='%(color:bold yellow)%(align:50,right)%(refname:short)%(end)%(color:reset)|%(color:bold red)%(align:5,middle)%(upstream:trackshort)%(end)%(color:reset)|%(color:bold green)%(align:12,right)%(committerdate:relative)%(end)%(color:reset)|%(color:bold blink brightred)%(HEAD)%(color:reset)|%(color:brightcyan)%(authorname)|%(color:bold blue)%(subject)%(color:reset) %(color:dim white)%(upstream:track)'|column -ts'|'"
+  g = grep --break --heading --line-number
+
+[stash]
+  include-untracked = true
+
+[pack]
+  threads = 0
+
+[push]
+  default = simple
+
+[apply]
+  whitespace = strip
+
+[mirror]
+  summary = true
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true  # use n and N to move between diff sections
+
+[merge]
+  conflictstyle = diff3
+
+[diff]
+  colorMoved = default
+  color = auto
+  rename = copy
+  # tool = Kaleidoscope
+
+[difftool "Kaleidoscope"]
+  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+
+[mergetool "Kaleidoscope"]
+  cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+  trustExitCode = true
+
+[mergetool]
+  prompt = false
+  keepBackup = true
+
+[git-up "fetch"]
+  all = true
+
+[git-up "rebase"]
+  auto = false
+  show-hashes = true
+
+[difftool]
+  prompt = false
+
+[pager]
+  color = true
+
+[status]
+  color = auto
+
+[color]
+  branch = auto
+  diff = auto
+  status = auto
+  interactive = auto
+  ui = 1
+
+[format]
+  numbered = auto
+
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
 
 [filter "media"]
-	clean = git media clean %f
-	smudge = git media smudge %f
-	required = true
+  required = true
+  clean = git media clean %f
+  smudge = git media smudge %f
+
+[rerere]
+  enabled = true
+
+[commit]
+  gpgsign = true
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+
+[gpg]
+  program = /opt/homebrew/bin/gpg
+
+[grep]
+  extendRegexp = true
+  lineNumber = true

@@ -1,21 +1,58 @@
-# third partied
+# already in .git elsewhere
+.vim
+.vimrc
+# shouldn't be gitted
+Applications
+Desktop/
+Documents/
+Downloads/
+Dropbox/
+Library/
+Movies/
+Music/
+Pictures/
+Public/
+Sites/
+bin/
+src/
+.Trash
+
+#others
+.DS_Store
+.ssh/id_dsa
+.zsh_history
+.zcompdump
+.gnupg
+.npm
 .rvm
 .gem
-.rbenv
-
-# don't track this!
-.ssh
-
-# histories
-.*-history
-.*_history
-.lesshst
-
-# caches
+.rubinius_last_error
+.passenger-enterprise
+.dropbox
 .viminfo
-.zcompdump
-
-# now, ignore things that are real files, 
-# because they'll probably never be part of the repo
-#
-[0-9A-Za-z]*
+.python-eggs/
+.gpg-agent-info
+.*history
+BTSync/
+Creative Cloud Files/
+Projects/
+.CFUserTextEncoding
+.Xauthority
+.apdisk
+.plexht/
+.m2
+.font*
+.rnd
+.cache
+*cache*
+VirtualBox VMs
+node_modules
+/.node-gyp
+/.cache
+/.local/share
+/.rbenv
+/.ansible/collections
+/.heroku/node*
+/.heroku/client
+/.zsh_sessions/*.session
+/.fnm/node-versions
