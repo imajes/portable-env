@@ -6,7 +6,7 @@ export ZSH_HOME=$HOME/.oh-my-zsh
 
 # Set to the name theme to load.
 # Look in ~/.oh-my-zsh/themes/
-export ZSH_THEME="sorin"
+export ZSH_THEME="agnoster"
 
 source $ZSH/oh-my-zsh.sh
 
