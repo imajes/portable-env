@@ -3,7 +3,7 @@
 	url = https://github.com/imajes/nvim-config.git
 [submodule ".config/zsh"]
 	path = .config/zsh
-	url = git@github.com:imajes/zsh.env.git
+	url = https://github.com/imajes/zsh.env.git
 [submodule ".pyenv"]
 	path = .pyenv
 	url = https://github.com/pyenv/pyenv.git
