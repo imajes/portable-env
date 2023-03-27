@@ -1,15 +1,9 @@
 [submodule ".config/nvim"]
 	path = .config/nvim
 	url = https://github.com/imajes/nvim-config.git
-[submodule ".oh-my-zsh"]
-	path = .oh-my-zsh
-	url = https://github.com/ohmyzsh/ohmyzsh.git
-[submodule ".extras/evalcache"]
-	path = .extras/evalcache
-	url = https://github.com/mroth/evalcache
-[submodule ".extras/zsh-histdb"]
-	path = .extras/zsh-histdb
-	url = https://github.com/larkery/zsh-histdb
+[submodule ".config/zsh"]
+	path = .config/zsh
+	url = git@github.com:imajes/zsh.env.git
 [submodule ".pyenv"]
 	path = .pyenv
 	url = https://github.com/pyenv/pyenv.git

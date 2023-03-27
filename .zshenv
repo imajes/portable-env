@@ -1,1 +1,1 @@
-. "$HOME/.cargo/env"
+.config/zsh/.zshenv
