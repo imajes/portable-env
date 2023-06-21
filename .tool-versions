@@ -1,0 +1,6 @@
+ruby   3
+node   lts
+golang latest
+rust   latest
+julia  latest
+lua    latest
