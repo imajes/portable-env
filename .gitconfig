@@ -1,7 +1,7 @@
 [user]
   email = james@imaj.es
   name = James Cox
-  signingkey = D80F4598CB239FD6
+  signingkey = 3D7D571492E8D687
 
 [core]
   excludesfile = /Users/james/.gitignore_global
@@ -135,9 +135,6 @@
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
-
-[gpg]
-  program = /opt/homebrew/bin/gpg
 
 [grep]
   extendRegexp = true
