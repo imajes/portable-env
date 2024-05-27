@@ -1,0 +1,23 @@
+vsync = false
+frame = "transparent"
+title-hidden = true
+
+[font]
+normal = ["Fira Code Light"]
+size = 18
+edging = "subpixelantialias"
+hinting = "slight"
+
+[font.features]
+FiraCode = [
+  "+zero",
+  "+cv02",
+  "+cv01",
+  "+ss01",
+  "+cv14",
+  "+ss08",
+  "+cv24",
+  "+ss06",
+  "+cv27",
+  "+ss07",
+]
