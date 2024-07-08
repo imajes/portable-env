@@ -1,6 +1,3 @@
-[submodule ".pyenv"]
-	path = .pyenv
-	url = https://github.com/pyenv/pyenv.git
 [submodule ".config/nvim"]
 	path = .config/nvim
 	url = https://github.com/imajes/nvim-config.git
