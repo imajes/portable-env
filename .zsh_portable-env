@@ -1,0 +1,3 @@
+# local overrides to zsh for portable environments
+#
+POWERLEVEL9K_DISABLE_GITSTATUS=true
