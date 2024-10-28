@@ -4,7 +4,7 @@ title-hidden = true
 
 [font]
 normal = ["Fira Code Light"]
-size = 18
+size = 17
 edging = "subpixelantialias"
 hinting = "slight"
 

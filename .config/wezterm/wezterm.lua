@@ -4,10 +4,10 @@ local act = wezterm.action
 -- wezterm.gui is not available to the mux server, so take care to
 -- do something reasonable when this config is evaluated by the mux
 local function get_appearance()
-	-- if wezterm.gui then
-	-- 	return wezterm.gui.get_appearance()
-	-- end
-	return "Dark"
+	if wezterm.gui then
+		return wezterm.gui.get_appearance()
+	end
+	-- return "Dark"
 end
 
 local function scheme_for_appearance(appearance)
@@ -15,8 +15,9 @@ local function scheme_for_appearance(appearance)
 	if appearance:find("Dark") then
 		return "duskfox"
 	else
-		-- return "duskfox"
-		return "Atelier Plateau Light (base16)"
+		-- return "Tomorrow Night Eighties"
+		-- return "Atelier Plateau Light (base16)"
+		return "dayfox"
 	end
 end
 
@@ -81,7 +82,7 @@ return {
 		-- /= <= >= != -> <- => := ... ++ -- :: // ** /* */ << >> && || ?? ::= \\ [] {. .} =~
 	}),
 
-	font_size = 18,
+	font_size = 15,
 
 	window_padding = {
 		left = 10,
@@ -105,8 +106,8 @@ return {
 
 	window_frame = {
 		font = wezterm.font({
-			family = "Fira Code",
-			weight = 450,
+			family = "Fira Code Retina",
+			-- weight = "450", -- retina
 			stretch = "Normal",
 			style = "Normal",
 			-- https://github.com/tonsky/FiraCode/wiki/How-to-enable-stylistic-sets
@@ -116,7 +117,7 @@ return {
 
 		-- The size of the font in the tab bar.
 		-- Default to 10. on Windows but 12.0 on other systems
-		font_size = 15.0,
+		font_size = 13.0,
 
 		active_titlebar_bg = active_titlebar_bg(get_appearance()),
 		active_titlebar_fg = active_titlebar_fg(get_appearance()),
@@ -142,11 +143,8 @@ return {
 				bg_color = active_titlebar_bg(get_appearance()),
 				fg_color = active_titlebar_fg(get_appearance()),
 
-				-- Specify whether you want "Half", "Normal" or "Bold" intensity for the
-				-- label shown for this tab.
-				-- The default is "Normal"
 				intensity = "Normal",
-				underline = "None",
+				underline = "Single",
 				italic = false,
 				strikethrough = false,
 			},
@@ -154,9 +152,6 @@ return {
 				bg_color = inactive_titlebar_bg(get_appearance()),
 				fg_color = inactive_titlebar_fg(get_appearance()),
 
-				-- Specify whether you want "Half", "Normal" or "Bold" intensity for the
-				-- label shown for this tab.
-				-- The default is "Normal"
 				intensity = "Normal",
 				underline = "None",
 				italic = false,
