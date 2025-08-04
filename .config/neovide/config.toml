@@ -3,21 +3,51 @@ frame = "transparent"
 title-hidden = true
 
 [font]
-normal = ["Fira Code Light"]
-size = 17
+size = 19
 edging = "subpixelantialias"
 hinting = "slight"
 
+[[font.normal]]
+family = "CommitMono"
+style = "W275"
+
+# You can set a different font for fallback
+[[font.normal]]
+family = "Fira Code Light"
+style = "Normal"
+
+[[font.bold]]
+family = "CommitMono"
+style = "W500"
+
 [font.features]
-FiraCode = [
-  "+zero",
-  "+cv02",
-  "+cv01",
+
+CommitMono = [
+  "+cv05",
+  "+cv08",
+  "+cv09",
   "+ss01",
-  "+cv14",
-  "+ss08",
-  "+cv24",
-  "+ss06",
-  "+cv27",
-  "+ss07",
+  "+ss02",
+  "+ss03",
+  "+ss04",
+  "+ss05",
 ]
+
+# CommitMono = ["+cv05", "+cv08", "+cv09", "+ss01", "+ss02"]
+
+FiraCode = [
+  "+cv01",
+  "+cv02",
+  "+cv14",
+  "+cv24",
+  "+cv27",
+  "+ss01",
+  "+ss06",
+  "+ss07",
+  "+ss08",
+  "+zero",
+]
+
+# https://neovide.dev/config-file.html?highlight=box#box-drawing
+[box-drawing]
+mode = "native"

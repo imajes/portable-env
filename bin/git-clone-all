@@ -1,0 +1,4 @@
+#!/bin/bash
+for branch in $(git branch --all | grep '^\s*remotes/bitbucket' | egrep --invert-match '(:?HEAD|main|master|production|staging)$'); do
+  git branch --track "${branch##*/}" "$branch"
+done

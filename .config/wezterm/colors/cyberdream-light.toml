@@ -1,0 +1,101 @@
+[colors]
+ansi = [
+  "#ffffff",
+  "#d11500",
+  "#008b0c",
+  "#997b00",
+  "#0057d1",
+  "#a018ff",
+  "#008c99",
+  "#16181a",
+]
+
+brights = [
+  "#acacac",
+  "#d11500",
+  "#008b0c",
+  "#997b00",
+  "#0057d1",
+  "#a018ff",
+  "#008c99",
+  "#16181a",
+]
+
+foreground = "#16181a"
+background = "#ffffff"
+
+cursor_bg = "#16181a"
+cursor_fg = "#ffffff"
+cursor_border = "#16181a"
+compose_cursor = "#d11500"
+
+selection_fg = "#16181a"
+selection_bg = "#acacac"
+
+scrollbar_thumb = "#ffffff"
+split = "#ffffff"
+
+visual_bell = "#acacac"
+
+[colors.indexed]
+16 = "#d17c00"
+17 = "#d11500"
+
+# [window_frame]
+# # active_titlebar_bg = "#acacac"
+# # active_titlebar_fg = "#cacaca"
+# active_titlebar_bg = "#00ff00"
+# active_titlebar_fg = "#0f0f0f"
+# inactive_titlebar_bg = "#ff00ff"
+# inactive_titlebar_fg = "#00ffff"
+
+[colors.tab_bar]
+background = "#acacac"
+inactive_tab_edge = "#232831"
+inactive_tab_edge_hover = "#39404f"
+
+[colors.tab_bar.active_tab]
+bg_color = "#d17c00"
+fg_color = "#000000"
+intensity = "Bold"
+italic = false
+strikethrough = false
+underline = "Single"
+
+# [colors.tab_bar.inactive_tab]
+# bg_color = "#ffffff"
+# fg_color = "#16181a"
+# intensity = "Normal"
+# italic = false
+# strikethrough = false
+# underline = "None"
+#
+# [colors.tab_bar.inactive_tab_hover]
+# bg_color = "#444c5e"
+# fg_color = "#cdcecf"
+# intensity = "Normal"
+# italic = false
+# strikethrough = false
+# underline = "None"
+#
+# [colors.tab_bar.new_tab]
+# bg_color = "#2e3440"
+# fg_color = "#abb1bb"
+# intensity = "Normal"
+# italic = false
+# strikethrough = false
+# underline = "None"
+#
+# [colors.tab_bar.new_tab_hover]
+# bg_color = "#444c5e"
+# fg_color = "#cdcecf"
+# intensity = "Normal"
+# italic = false
+# strikethrough = false
+# underline = "None"
+
+[metadata]
+aliases = []
+author = "@imajes"
+name = "CYBERDREAM"
+origin_url = "https://github.com/scottmckendry/cyberdream.nvim/tree/main/extras/wezterm"

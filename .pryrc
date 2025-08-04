@@ -1,87 +1,82 @@
-# coding:utf-8 vim:ft=ruby
+# frozen_string_literal: true
 
-Pry.config.pager = true
-Pry.config.color = true
-Pry.config.history.should_save = true
-
-# # wrap ANSI codes so Readline knows where the prompt ends
-# def colour(name, text)
-#   if Pry.color
-#     "\001#{Pry::Helpers::Text.send name, '{text}'}\002".sub '{text}', "\002#{text}\001"
-#   else
-#     text
-#   end
-# end
-
-def colour(name, text)
-  Pry::Helpers::Text.send name, text
-end
-
-# pretty prompt
-Pry.config.prompt = [
-  proc do |object, nest_level, pry|
-    prompt  = colour :bright_black, Pry.view_clip(object)
-    prompt += ":#{nest_level}" if nest_level > 0
-    prompt += colour :cyan, ' » '
-  end, proc { |object, nest_level, pry| colour :cyan, '» ' }
-]
-
-if defined?(AwesomePrint)
-  AwesomePrint.pry!
-end
-
-# # tell Readline when the window resizes
-# old_winch = trap 'WINCH' do
-#   if `stty size` =~ /\A(\d+) (\d+)\n\z/
-#     Readline.set_screen_size $1.to_i, $2.to_i
-#   end
-#   old_winch.call unless old_winch.nil?
-# end
-#
-# # use awesome print for output if available
-# original_print = Pry.config.print
-# Pry.config.print = proc do |output, value|
-#   begin
-#     require 'awesome_print'
-#     value = value.to_a if defined?(ActiveRecord) && value.is_a?(ActiveRecord::Relation)
-#     output.puts value.ai
-#   rescue LoadError => err
-#     original_print.call(output, value)
-#   end
-# end
-
-# startup hooks
-org_logger_active_record = nil
-org_logger_rails = nil
-Pry.hooks.add_hook :before_session, :rails do |output, target, pry|
-  # show ActiveRecord SQL queries in the console
-  if defined? ActiveRecord
-    org_logger_active_record = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = Logger.new STDOUT
-  end
-
+Pry.hooks.add_hook :before_session, :rails do |_output, _target, _pry|
   if defined?(Rails) && Rails.env
-    # output all other log info such as deprecation warnings to the console
-    if Rails.respond_to? :logger=
-      org_logger_rails = Rails.logger
-      Rails.logger = Logger.new STDOUT
-    end
-
     # load Rails console commands
-    if Rails::VERSION::MAJOR >= 3
-      require 'rails/console/app'
-      require 'rails/console/helpers'
-      if Rails.const_defined? :ConsoleMethods
-        extend Rails::ConsoleMethods
-      end
-    else
-      require 'console_app'
-      require 'console_with_helpers'
-    end
+    require 'rails/console/app'
+    require 'rails/console/helpers'
+    # require 'zipline/console_helpers'
+    # Rails::ConsoleMethods.include Zipline::ConsoleHelpers
+    # Rails::ConsoleMethods.extend Zipline::ConsoleMethods
+    #
+    # extend Rails::ConsoleMethods if Rails.const_defined? :ConsoleMethods
   end
 end
 
-Pry.hooks.add_hook :after_session, :rails do |output, target, pry|
-  ActiveRecord::Base.logger = org_logger_active_record if org_logger_active_record
-  Rails.logger = org_logger_rails if org_logger_rails
+Pry.config.completer = nil ### too slow
+
+if ENV["PRY_HISTFILE"]
+  Pry.config.history_save = true
+  Pry.config.history_file = ENV["PRY_HISTFILE"]
+  puts " - Loaded Pry history"
 end
+
+if defined?(PryByebug)
+  Pry.commands.alias_command 'c', 'continue'
+  Pry.commands.alias_command 's', 'step'
+  Pry.commands.alias_command 'n', 'next'
+  Pry.commands.alias_command 'f', 'finish'
+  Pry.commands.alias_command 'b', 'break'
+  Pry.commands.alias_command 'q', 'quit'
+  puts " - Loaded Byebug aliases"
+end
+
+# db_configured =
+#   begin
+#     Apartment::Tenant.current
+#     true
+#   rescue ActiveRecord::ConnectionNotEstablished
+#     false
+#   end
+
+if Pry::Prompt[:rails]
+  formatted_env = if Rails.env.production?
+                    Pry::Helpers::Text.red(Pry::Helpers::Text.bold('prod'))
+                  elsif Rails.env.development?
+                    Pry::Helpers::Text.green('dev')
+                  else
+                    Pry::Helpers::Text.white(Rails.env)
+                  end
+
+  desc = <<~TXT
+    Includes the current organization and Rails environment.
+      "[1] [current_org][Rails.env] »"
+  TXT
+
+  # org =
+  #   if db_configured
+  #     Apartment::Tenant.current == 'public' ? '' : Pry::Helpers::Text.purple(Apartment::Tenant.current)
+  #   else
+  #     '-'
+  #   end
+
+  Pry::Prompt.add 'custom', desc, %w[» *] do |context, _nesting, pry_instance, sep|
+    format(
+      "%<in_count>s: [%<org>s][%<env>s] %<context>s%<separator>s ",
+      in_count: Pry::Helpers::Text.blue(pry_instance.input_ring.count),
+      org: "*",#org,
+      env: formatted_env,
+      context: Pry.view_clip(context) == 'main' ? '' : Pry.view_clip(context),
+      separator: Pry::Helpers::Text.magenta(sep)
+    )
+  end
+
+  Pry.config.prompt = Pry::Prompt[:custom]
+  puts " - Added custom prompt"
+end
+
+if File.exist?(File.expand_path('~/.pryrc.local'))
+  load File.expand_path('~/.pryrc.local')
+  puts " - Loaded local Pry tweaks from ~/.pryrc.local"
+end
+

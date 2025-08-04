@@ -1,0 +1,46 @@
+#!/usr/bin/env zsh
+
+print -P -- "\n%F{cyan}🧠 Zsh Quick Reference — Welcome to Your Enhanced Shell%f\n"
+
+print -P -- "%F{yellow}▶ Navigation%f"
+print -P -- "  cd <dir>       — fuzzy cd via zoxide"
+print -P -- "  b [N]          — back N pushd entries (default 1)"
+print -P -- "  dgo N          — jump to pushd stack entry N"
+print -P -- "  d              — list directory stack"
+
+print -P -- "\n%F{yellow}▶ Git & ForGit (fzf-powered)%f"
+print -P -- "  forgit status  — interactive status"
+print -P -- "  gca            — commit all with message"
+print -P -- "  gco            — checkout branches via fzf"
+
+print -P -- "\n%F{yellow}▶ Sysadmin Tools%f"
+print -P -- "  ss             — sudo su -"
+print -P -- "  extract <file> — auto-extract archives"
+print -P -- "  portwatch      — see which process is using a port"
+
+print -P -- "\n%F{yellow}▶ 1Password Secrets (op)%f"
+print -P -- "  op read op://...   — fetch secret from vault"
+print -P -- "  export FOO=\$(op read op://path) — safe usage"
+
+print -P -- "\n%F{yellow}▶ History & Search%f"
+print -P -- "  ↑ / ↓          — search recent history by prefix"
+print -P -- "  ^R             — fzf-powered history search (via atuin)"
+print -P -- "  history        — view persistent, shared command log"
+
+print -P -- "\n%F{yellow}▶ Dev Tools & Env%f"
+print -P -- "  mise           — version manager (like asdf)"
+print -P -- "  spacecop       — rubocop auto-fix shortcut"
+print -P -- "  EDITOR=vi      — opens nvim/vim with wrapper"
+
+print -P -- "\n%F{yellow}▶ Aliases & Quality of Life%f"
+print -P -- "  ls             — eza or exa (grouped, icons)"
+print -P -- "  rg             — ripgrep w/ preview"
+print -P -- "  cat / less     — powered by bat (if installed)"
+
+print -P -- "\n%F{yellow}▶ Misc & Power Features%f"
+print -P -- "  direnv         — auto-load .envrc per directory"
+print -P -- "  register_project_cleanup <proc> <sock> — cleanup hook on exit"
+
+print -P -- "\n%F{magenta}Tip:%f Run %F{cyan}zsh-welcome%f anytime to see this again."
+print -P -- "%F{magenta}To disable permanently:%f export DISABLE_ZSH_WELCOME=1\n"
+

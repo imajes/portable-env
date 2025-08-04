@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use Memoize;
+use Data::Dumper;
+
+
+my $BLOBS = {};
+
+MAIN: {
+
+    memoize 'check_tree';
+
+    die "usage: git-find-blob <blob1> <blob2> ... -- [<git-log arguments ...>]\n"
+        if not @ARGV;
+
+
+    while ( @ARGV && $ARGV[0] ne '--' ) {
+        my $arg = $ARGV[0];
+        #print "Processing argument $arg\n";
+        open my $rev_parse, '-|', git => 'rev-parse' => '--verify', $arg or die "Couldn't open pipe to git-rev-parse: $!\n";
+        my $obj_name = <$rev_parse>;
+        close $rev_parse or die "Couldn't expand passed blob.\n";
+        chomp $obj_name;
+        #$obj_name eq $ARGV[0] or print "($ARGV[0] expands to $obj_name)\n";
+        print "($arg expands to $obj_name)\n";
+        $BLOBS->{$obj_name} = $arg;
+        shift @ARGV;
+    }
+    shift @ARGV; # drop the -- if present
+
+    #print "BLOBS: " . Dumper($BLOBS) . "\n";
+
+    foreach my $blob ( keys %{$BLOBS} ) {
+        #print "Printing results for blob $blob:\n";
+
+        open my $log, '-|', git => log => @ARGV, '--pretty=format:%T %h %s'
+            or die "Couldn't open pipe to git-log: $!\n";
+
+        while ( <$log> ) {
+            chomp;
+            my ( $tree, $commit, $subject ) = split " ", $_, 3;
+            #print "Checking tree $tree\n";
+            my $results = check_tree( $tree );
+
+            #print "RESULTS: " . Dumper($results);
+            if (%{$results}) {
+                print "$commit $subject\n";
+                foreach my $blob ( keys %{$results} ) {
+                    print "\t" . (join ", ", @{$results->{$blob}}) . "\n";
+                }
+            }
+        }
+    }
+
+}
+
+
+sub check_tree {
+    my ( $tree ) = @_;
+    #print "Calculating hits for tree $tree\n";
+
+    my @subtree;
+
+    # results = { BLOB => [ FILENAME1 ] }
+    my $results = {};
+    {
+        open my $ls_tree, '-|', git => 'ls-tree' => $tree
+            or die "Couldn't open pipe to git-ls-tree: $!\n";
+
+        # example git ls-tree output:
+        # 100644 blob 15d408e386400ee58e8695417fbe0f858f3ed424    filaname.txt
+        while ( <$ls_tree> ) {
+            /\A[0-7]{6} (\S+) (\S+)\s+(.*)/
+                or die "unexpected git-ls-tree output";
+            #print "Scanning line '$_' tree $2 file $3\n";
+            foreach my $blob ( keys %{$BLOBS} ) {
+                if ( $2 eq $blob ) {
+                    print "Found $blob in $tree:$3\n";
+                    push @{$results->{$blob}}, $3;
+                }
+            }
+            push @subtree, [$2, $3] if $1 eq 'tree';
+        }
+    }
+
+    foreach my $st ( @subtree ) {
+        # $st->[0] is tree, $st->[1] is dirname
+        my $st_result = check_tree( $st->[0] );
+        foreach my $blob ( keys %{$st_result} ) {
+            foreach my $filename ( @{$st_result->{$blob}} ) {
+                my $path = $st->[1] . '/' . $filename;
+                #print "Generating subdir path $path\n";
+                push @{$results->{$blob}}, $path;
+            }
+        }
+    }
+
+    #print "Returning results for tree $tree: " . Dumper($results) . "\n\n";
+    return $results;
+}

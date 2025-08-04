@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Find and print the shas of the largest commits
+
+for sha in $(git rev-list --all --pretty=format:"" | sed "s/^commit //"); do
+  git diff-tree -r -c -M -C --no-commit-id $sha | awk '{print $4}' | git cat-file --batch-check 2>/dev/null | awk '{ sum+=$3 } END {printf "%010d %s\n", sum, "'"$sha"'"}'
+done | sort | tail
