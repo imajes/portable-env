@@ -1,5 +1,5 @@
 [tools]
-golang = "latest"
+go = "latest"
 julia = "latest"
 lua = "latest"
 node = "lts"
