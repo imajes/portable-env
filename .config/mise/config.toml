@@ -15,9 +15,9 @@ idiomatic_version_file_enable_tools = []
 
 # Global, applies everywhere; the script itself no-ops outside Ruby projects
 [env]
-_.path = [
-  '{{ exec(command=xdg_config_home ~ "/mise/scripts/env-ruby.zsh " ~ cwd) }}',
-]
+# _.path = [
+#   '{{ exec(command=xdg_config_home ~ "/mise/scripts/env-ruby.zsh " ~ cwd) }}',
+# ]
 
 # These are literal op:// refs; nothing is fetched until you wrap a command in `op run`.
 ANTHROPIC_API_KEY = { value = "op://Code/tdp3brwgxo4tspqhem5jxdj4j4/credential", redact = true }
