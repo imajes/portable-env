@@ -1,12 +1,8 @@
 [tools]
 go = "latest"
-julia = "latest"
-lua = "latest"
 node = "lts"
-python = "3.12"
-ruby = "3.4"
+python = "latest"
 rust = "latest"
-uv = "latest"
 
 [settings]
 experimental = true
@@ -20,9 +16,9 @@ idiomatic_version_file_enable_tools = []
 # ]
 
 # These are literal op:// refs; nothing is fetched until you wrap a command in `op run`.
-ANTHROPIC_API_KEY = { value = "op://Code/tdp3brwgxo4tspqhem5jxdj4j4/credential", redact = true }
-OPENAI_API_KEY = { value = "op://Private/634x5aqodwreu7foqxc2cuskdq/API-KEYS/cli-usage", redact = true }
-WANDB_API_KEY = { value = "op://code/wandb/credential", redact = true }
+# ANTHROPIC_API_KEY = { value = "op://Code/tdp3brwgxo4tspqhem5jxdj4j4/credential", redact = true }
+# OPENAI_API_KEY = { value = "op://Private/634x5aqodwreu7foqxc2cuskdq/API-KEYS/cli-usage", redact = true }
+# WANDB_API_KEY = { value = "op://code/wandb/credential", redact = true }
 
 
 # ruby = "{{ get_env(name='RUBY_VERSION', default='3.3.3') }}"
