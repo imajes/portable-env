@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local fontdefs = require("fonts")
 local config = wezterm.config_builder()
+local smart_tab_title = require("smart_tab_title")
 
 -- wezterm.gui is not available to the mux server, so take care to
 -- do something reasonable when this config is evaluated by the mux
@@ -18,17 +19,31 @@ local function scheme_for_appearance(appearance)
 	else
 		-- return "Tomorrow Night Eighties"
 		-- return "Atelier Plateau Light (base16)"
-		-- return "dayfox"
+		return "dayfox"
 		-- return "flexoki-light"
-		return "CYBERDREAM"
+		-- return "CYBERDREAM"
 	end
 end
 
+-- enable better tab titles
+
+-- Optional: override defaults from the main config
+-- smart_tab_title.settings.max_path_segments = 3
+-- smart_tab_title.settings.boring_procs.zsh = true
+-- smart_tab_title.settings.boring_procs.fish = true
+
+wezterm.on("format-tab-title", function(tab, tabs, panes, cfg, hover, max_width)
+	return smart_tab_title.format_tab_title(tab, tabs, panes, cfg, hover, max_width)
+end)
+
 -- local scheme_colors, _meta = wezterm.color.load_scheme("/Users/james/.config/wezterm/colors/cyberdream-light.toml")
 
-config.font = fontdefs.commit_light
 config.font_size = 15
 config.line_height = 1.1
+config.warn_about_missing_glyphs = true
+
+config.font = fontdefs.commit_light
+config.font_rules = fontdefs.font_rules
 
 config.cursor_blink_rate = 500
 config.cursor_blink_ease_in = "EaseInOut"

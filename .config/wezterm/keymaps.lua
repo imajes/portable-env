@@ -1,6 +1,15 @@
-local act = require("wezterm").action
+local wezterm = require("wezterm")
+local act = wezterm.action
+
+wezterm.on("ShowEffectiveConfig", function(window, pane)
+	local effective = window:effective_config()
+	wezterm.log_error("=== Effective Config ===")
+	wezterm.log_error(require("wezterm").json_encode(effective, { indent = true }))
+	wezterm.log_error("=== End of Config ===")
+end)
 
 return {
+	{ key = "e", mods = "CMD|OPT", action = act.EmitEvent("ShowEffectiveConfig") },
 	{ key = "d", mods = "CMD|OPT", action = act.ShowDebugOverlay },
 	{ key = "r", mods = "CMD|OPT", action = act.ReloadConfiguration },
 

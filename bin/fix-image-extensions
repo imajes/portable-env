@@ -1,0 +1,148 @@
+#!/usr/bin/env zsh
+# fix-image-extensions — Detect true image type and ensure correct extension.
+# Supports: JPEG (.jpg), PNG (.png), GIF (.gif), WebP (.webp)
+# macOS + zsh. Safe-by-default (dry-run). Use --apply to rename.
+
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  fix-image-extensions [--apply] [--recurse] [DIR]
+
+Options:
+  --apply     Perform renames (default is dry-run)
+  --recurse   Recurse into subdirectories
+  DIR         Target directory (default: .)
+
+Notes:
+  - MIME detection via /usr/bin/file (content-based)
+  - Name collisions resolve by appending -1, -2, ...
+  - Normalizes extension case to lowercase
+USAGE
+}
+
+# ---- Parse args
+APPLY=false
+RECURSE=false
+TARGET_DIR="."
+
+for arg in "$@"; do
+  case "$arg" in
+    --apply)   APPLY=true ;;
+    --recurse) RECURSE=true ;;
+    -h|--help) usage; exit 0 ;;
+    --)        shift; break ;;
+    -*)        echo "Unknown option: $arg" >&2; usage; exit 1 ;;
+    *)         TARGET_DIR="$arg" ;;
+  esac
+done
+
+# ---- Validate deps and dir
+[[ -x /usr/bin/file ]] || { echo "Error: /usr/bin/file not found." >&2; exit 1; }
+[[ -d "$TARGET_DIR"   ]] || { echo "Error: '$TARGET_DIR' is not a directory." >&2; exit 1; }
+
+# ---- Gather files
+setopt null_glob
+typeset -a FILES
+if $RECURSE; then
+  FILES=("$TARGET_DIR"/**/*(.N))
+else
+  FILES=("$TARGET_DIR"/*(.N))
+fi
+
+echo "Scanning: $TARGET_DIR  (recurse=$RECURSE, apply=$APPLY)"
+echo "Found ${#FILES} regular file(s)."
+(( ${#FILES} == 0 )) && echo "No files matched. Try --recurse if images are in subfolders."
+
+# ---- MIME -> ext
+mime_to_ext() {
+  case "$1" in
+    image/jpeg) echo jpg ;;   # swap to "jpeg" if you prefer
+    image/png)  echo png ;;
+    image/gif)  echo gif ;;
+    image/webp) echo webp ;;
+    # Optional extras:
+    image/heic) echo heic ;;
+    image/tiff) echo tif  ;;
+    *)          echo "" ;;
+  esac
+}
+
+# ---- Unique name helper
+unique_path() {
+  local path="$1"
+  local base="${path%.*}"
+  local ext="${path##*.}"
+  local n=1
+  local candidate="$path"
+  while [[ -e "$candidate" ]]; do
+    candidate="${base}-${n}.${ext}"
+    (( n += 1 ))
+  done
+  print -r -- "$candidate"
+}
+
+changed=0
+skipped=0
+
+for f in "${FILES[@]}"; do
+  # Skip unreadable or empty files
+  if [[ ! -r "$f" || ! -s "$f" ]]; then
+    (( skipped += 1 ))
+    continue
+  fi
+
+  mime="$(/usr/bin/file -b --mime-type -- "$f" 2>/dev/null || true)"
+  want_ext="$(mime_to_ext "$mime")"
+  if [[ -z "$want_ext" ]]; then
+    (( skipped += 1 ))
+    continue
+  fi
+
+  fname="${f:t}"
+  dir="${f:h}"
+  if [[ "$fname" == *.* ]]; then
+    cur_ext="${fname##*.}"
+    cur_ext_l="${cur_ext:l}"
+    stem="${fname%.*}"
+  else
+    cur_ext=""
+    cur_ext_l=""
+    stem="$fname"
+  fi
+
+  # Decide target path
+  if [[ "$cur_ext_l" == "$want_ext" ]]; then
+    # Normalize extension case if needed
+    if [[ -n "$cur_ext" && "$cur_ext" != "$cur_ext_l" ]]; then
+      new="${dir}/${stem}.${want_ext}"
+    else
+      (( skipped += 1 ))
+      continue
+    fi
+  else
+    new="${dir}/${stem}.${want_ext}"
+  fi
+
+  # Avoid overwriting existing files
+  if [[ -e "$new" ]]; then
+    new="$(unique_path "$new")"
+  fi
+
+  if $APPLY; then
+    echo "mv -- '$f' '$new'"
+    mv -- "$f" "$new"
+  else
+    echo "[dry-run] mv -- '$f' '$new'"
+  fi
+  (( changed += 1 ))
+done
+
+# Summary
+if $APPLY; then
+  echo "Done. Renamed: $changed   Skipped: $skipped"
+else
+  echo "Dry-run complete. Would rename: $changed   Skipped: $skipped"
+  echo "Run again with --apply to perform changes."
+fi

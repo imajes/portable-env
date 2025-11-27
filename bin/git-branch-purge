@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+git fetch -p origin
+git branch -r --merged origin/main |
+  sed 's#^ *origin/##' |
+  grep -v "origin/main" |
+  grep -Ev '^(main|HEAD|staging|master|develop|release/.+|hotfix/.+)$' |
+  sort -u |
+  # xargs -n1 -I {} echo "proposing to delete.." {}
+  xargs -n1 -I {} git push origin --delete {}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

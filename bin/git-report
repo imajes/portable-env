@@ -1,0 +1,468 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+git-report — export a time-bounded set of commits as JSON (single file or sharded).
+No third-party deps. Requires: python3, git in PATH.
+
+Examples:
+  # One JSON to stdout for a month
+  git-report --repo . --month 2025-08 > august.json
+
+  # Sharded per-commit JSONs + manifest, no embedded patches, save .patch files on disk
+  git-report --repo . --month 2025-08 --split-out out/month-2025-08 --save-patches out/month-2025-08/patches
+
+  # Embed full patches (unlimited) into JSON (big!)
+  git-report --repo . --month 2025-08 --include-patch > august_with_patches.json
+
+  # Enrich with GitHub PR info (requires GITHUB_TOKEN env or gh CLI)
+  git-report --repo . --month 2025-08 --github-prs --split-out out/aug
+"""
+
+import argparse, json, os, re, subprocess, sys, shutil, urllib.request, urllib.parse
+from datetime import datetime, timezone
+
+# ---------- helpers ----------
+
+
+def run(cmd, cwd=None, text=True):
+    p = subprocess.run(
+        cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=text
+    )
+    if p.returncode != 0:
+        raise RuntimeError(f"cmd failed: {' '.join(cmd)}\n{p.stderr}")
+    return p.stdout if text else p.stdout.decode()
+
+
+def git(root, *args):
+    return run(["git", *args], cwd=root)
+
+
+def short_sha(sha):
+    return sha[:12]
+
+
+def parse_origin_github(root):
+    """Return (owner, repo) if origin is GitHub, else None."""
+    try:
+        url = git(root, "config", "--get", "remote.origin.url").strip()
+    except Exception:
+        return None
+    if not url:
+        return None
+    # git@github.com:owner/repo.git or https://github.com/owner/repo(.git)
+    m = re.match(
+        r"(?:git@github\.com:|https?://github\.com/)([^/]+)/([^/]+?)(?:\.git)?$", url
+    )
+    if not m:
+        return None
+    return (m.group(1), m.group(2))
+
+
+def gh_api(owner, repo, path, token=None):
+    """GET GitHub API JSON, return Python object. token optional. Raises on failure."""
+    url = f"https://api.github.com/repos/{owner}/{repo}{path}"
+    req = urllib.request.Request(url)
+    req.add_header("Accept", "application/vnd.github+json")
+    if token:
+        req.add_header("Authorization", f"Bearer {token}")
+    with urllib.request.urlopen(req) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def gh_prs_for_commit(root, sha):
+    """Try to fetch PRs associated with a commit via GitHub API or gh CLI."""
+    owner_repo = parse_origin_github(root)
+    if not owner_repo:
+        return []
+    owner, repo = owner_repo
+    token = os.environ.get("GITHUB_TOKEN")
+    try:
+        if token:
+            prs = gh_api(owner, repo, f"/commits/{sha}/pulls", token=token)
+        else:
+            if shutil.which("gh"):
+                out = run(
+                    [
+                        "gh",
+                        "api",
+                        f"repos/{owner}/{repo}/commits/{sha}/pulls",
+                        "-H",
+                        "Accept: application/vnd.github+json",
+                    ]
+                )
+                prs = json.loads(out)
+            else:
+                return []  # no auth means likely rate limited; skip quietly
+        # Normalize minimal fields we care about
+        res = []
+        for pr in prs:
+            res.append(
+                {
+                    "number": pr.get("number"),
+                    "title": pr.get("title"),
+                    "state": pr.get("state"),
+                    "merged_at": pr.get("merged_at"),
+                    "html_url": pr.get("html_url"),
+                    # easy diff/patch URLs GitHub provides:
+                    "diff_url": pr.get("html_url") + ".diff"
+                    if pr.get("html_url")
+                    else None,
+                    "patch_url": pr.get("html_url") + ".patch"
+                    if pr.get("html_url")
+                    else None,
+                    "user": {"login": (pr.get("user") or {}).get("login")},
+                    "head": (pr.get("head") or {}).get("ref"),
+                    "base": (pr.get("base") or {}).get("ref"),
+                }
+            )
+        return res
+    except Exception:
+        return []
+
+
+def month_bounds(ym):
+    parts = ym.split("-")
+    if len(parts) != 2:
+        raise SystemExit("--month must be YYYY-MM")
+    y, m = int(parts[0]), int(parts[1])
+    if not (1 <= m <= 12):
+        raise SystemExit("month out of range")
+    since = f"{y}-{m:02}-01T00:00:00"
+    ny, nm = (y + 1, 1) if m == 12 else (y, m + 1)
+    until = f"{ny}-{nm:02}-01T00:00:00"
+    return since, until
+
+
+def resolve_range(args):
+    if args.month:
+        return month_bounds(args.month)
+    if args.since and args.until:
+        return args.since, args.until
+    raise SystemExit("provide --month YYYY-MM or both --since and --until")
+
+
+# ---------- git readers ----------
+
+
+def commits_in_range(root, since, until, include_merges=False):
+    args = [
+        "-c",
+        "log.showSignature=false",
+        "rev-list",
+        f"--since={since}",
+        f"--until={until}",
+        "--date-order",
+        "--reverse",
+        "HEAD",
+    ]
+    if not include_merges:
+        args.insert(4, "--no-merges")
+    out = git(root, *args)
+    return [l.strip() for l in out.splitlines() if l.strip()]
+
+
+def commit_meta(root, sha):
+    fmt = "%H%x00%P%x00%an%x00%ae%x00%ad%x00%cN%x00%cE%x00%cD%x00%at%x00%ct%x00%s%x00%b"
+    out = git(
+        root, "show", "--no-patch", "--date=iso-strict", f"--pretty=format:{fmt}", sha
+    )
+    parts = out.split("\x00")
+    (h, parents, an, ae, ad, cn, ce, cd, at, ct, subj, body) = (
+        parts
+        if len(parts) >= 12
+        else (sha, "", "", "", "", "", "", "", "0", "0", "", "")
+    )
+    return {
+        "sha": h,
+        "parents": parents.split() if parents else [],
+        "author": {"name": an, "email": ae, "date": ad},
+        "committer": {"name": cn, "email": ce, "date": cd},
+        "timestamps": {"author": int(at), "commit": int(ct)},
+        "subject": subj,
+        "body": body,
+    }
+
+
+def commit_numstat(root, sha):
+    # additions/deletions with renames (git prints new path in numstat for renames)
+    out = git(root, "show", "--numstat", "--format=", "--no-color", sha)
+    stats = {}
+    files = []
+    for line in out.splitlines():
+        parts = line.split("\t")
+        if len(parts) != 3:
+            continue
+        a, d, path = parts
+
+        def to_int(x):
+            try:
+                return int(x)
+            except:
+                return None
+
+        files.append({"file": path, "additions": to_int(a), "deletions": to_int(d)})
+        stats[path] = (to_int(a), to_int(d))
+    return files, stats
+
+
+def commit_name_status(root, sha):
+    # -z to be robust against funky filenames
+    out = subprocess.run(
+        ["git", "show", "--name-status", "-z", "--format=", "--no-color", sha],
+        cwd=root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if out.returncode != 0:
+        raise RuntimeError(out.stderr.decode())
+    data = out.stdout.decode("utf-8", "replace")
+    parts = data.split("\x00")
+    res = []
+    i = 0
+    while i < len(parts) and parts[i]:
+        code = parts[i]
+        i += 1
+        if code.startswith("R") or code.startswith("C"):
+            if i + 1 >= len(parts):
+                break
+            oldp = parts[i]
+            newp = parts[i + 1]
+            i += 2
+            res.append({"status": code, "old_path": oldp, "file": newp})
+        else:
+            if i >= len(parts):
+                break
+            p = parts[i]
+            i += 1
+            if p == "":
+                continue
+            res.append({"status": code, "file": p})
+    return res
+
+
+def commit_shortstat(root, sha):
+    out = (
+        git(root, "show", "--shortstat", "--format=", "--no-color", sha)
+        .strip()
+        .splitlines()
+    )
+    # usually last line like " X files changed, Y insertions(+), Z deletions(-)"
+    return out[-1] if out else ""
+
+
+def commit_patch(root, sha, max_bytes=0):
+    txt = git(root, "show", "--patch", "--format=", "--no-color", sha)
+    if max_bytes is None or max_bytes <= 0:
+        return txt, False
+    enc = txt.encode("utf-8")
+    if len(enc) <= max_bytes:
+        return txt, False
+    enc = enc[:max_bytes]
+    return enc.decode("utf-8", "ignore"), True
+
+
+# ---------- writing ----------
+
+
+def write_json(path, obj):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=2)
+
+
+def save_patch_file(root, sha, out_dir):
+    os.makedirs(out_dir, exist_ok=True)
+    p = os.path.join(out_dir, f"{short_sha(sha)}.patch")
+    txt = git(root, "show", "--patch", "--format=", "--no-color", sha)
+    with open(p, "w", encoding="utf-8") as f:
+        f.write(txt)
+    return p
+
+
+# ---------- main ----------
+
+
+def main():
+    ap = argparse.ArgumentParser(
+        prog="git-report",
+        description="Export commits as JSON (single file or sharded per commit).",
+    )
+    ap.add_argument("--repo", default=".", help="Path to git repo (default: .)")
+    # Range options
+    ap.add_argument("--month", help="YYYY-MM inclusive month")
+    ap.add_argument("--since", help="ISO-ish since (e.g., 2025-08-01T00:00:00)")
+    ap.add_argument("--until", help="ISO-ish until (exclusive)")
+    # Content switches
+    ap.add_argument(
+        "--include-merges", action="store_true", help="Include merge commits"
+    )
+    ap.add_argument(
+        "--include-patch",
+        action="store_true",
+        help="Embed unified patches in JSON (big)",
+    )
+    ap.add_argument(
+        "--max-patch-bytes",
+        type=int,
+        default=0,
+        help="Per-commit patch cap (0=no limit)",
+    )
+    ap.add_argument(
+        "--save-patches", help="Directory to write .patch files (referenced by JSON)"
+    )
+    # Output layout
+    ap.add_argument(
+        "--split-out", help="Write one JSON per commit + manifest.json to this dir"
+    )
+    ap.add_argument(
+        "--out", default="-", help="Single JSON output file or '-' (default stdout)"
+    )
+    # Integrations
+    ap.add_argument(
+        "--github-prs",
+        action="store_true",
+        help="Enrich commits with GitHub PR metadata if available (needs GITHUB_TOKEN or gh)",
+    )
+    # Friendly help
+    if len(sys.argv) == 1:
+        ap.print_help(sys.stderr)
+        sys.exit(1)
+    args = ap.parse_args()
+
+    since, until = resolve_range(args)
+    root = os.path.abspath(args.repo)
+    sharded = bool(args.split_out)
+
+    commits = commits_in_range(root, since, until, include_merges=args.include_merges)
+
+    manifest = {
+        "range": {"since": since, "until": until},
+        "repo": root,
+        "include_merges": args.include_merges,
+        "include_patch": args.include_patch,
+        "split": sharded,
+        "count": len(commits),
+        "authors": {},  # will fill counts
+        "summary": {"additions": 0, "deletions": 0, "files_touched": 0},
+        "items": [],  # commit entries or shard filenames
+    }
+
+    all_commits = []  # for single-json mode
+
+    files_touched_set = set()
+
+    for sha in commits:
+        meta = commit_meta(root, sha)
+        files, num_map = commit_numstat(root, sha)
+        ns = commit_name_status(root, sha)
+        pretty = commit_shortstat(root, sha)
+
+        # Combine statuses + numstat into one per-file view
+        files_detailed = []
+        if ns:
+            for entry in ns:
+                path = entry.get("file")
+                adds, dels = num_map.get(path, (None, None))
+                item = {
+                    "file": path,
+                    "status": entry["status"],
+                    "additions": adds,
+                    "deletions": dels,
+                }
+                if "old_path" in entry:
+                    item["old_path"] = entry["old_path"]
+                files_detailed.append(item)
+        else:
+            # fallback: just numstat
+            for f in files:
+                files_detailed.append(
+                    {
+                        "file": f["file"],
+                        "status": "M",
+                        "additions": f["additions"],
+                        "deletions": f["deletions"],
+                    }
+                )
+
+        # Aggregate summary
+        for f in files_detailed:
+            if f["additions"]:
+                manifest["summary"]["additions"] += f["additions"]
+            if f["deletions"]:
+                manifest["summary"]["deletions"] += f["deletions"]
+            files_touched_set.add(f["file"])
+
+        obj = {
+            **meta,
+            "short_sha": short_sha(meta["sha"]),
+            "files": files_detailed,
+            "diffstat_text": pretty,  # human one-liner metric
+            "patch_ref": {
+                "embed": bool(args.include_patch),
+                "git_show_cmd": [
+                    "git",
+                    "show",
+                    "--patch",
+                    "--format=",
+                    "--no-color",
+                    meta["sha"],
+                ],
+                "local_patch_file": None,
+                "github_diff_url": None,
+                "github_patch_url": None,
+            },
+        }
+
+        # GitHub PR enrichment (optional)
+        if args.github_prs:
+            prs = gh_prs_for_commit(root, meta["sha"])
+            if prs:
+                obj["github_prs"] = prs
+                # Handy direct URLs if any PR found
+                obj["patch_ref"]["github_diff_url"] = prs[0].get("diff_url")
+                obj["patch_ref"]["github_patch_url"] = prs[0].get("patch_url")
+
+        # Patch embedding or saving
+        if args.include_patch:
+            patch, clipped = commit_patch(root, meta["sha"], args.max_patch_bytes)
+            obj["patch"] = patch
+            obj["patch_clipped"] = bool(clipped)
+        if args.save_patches:
+            obj["patch_ref"]["local_patch_file"] = save_patch_file(
+                root, meta["sha"], args.save_patches
+            )
+
+        # Author count
+        akey = f"{meta['author']['name']} <{meta['author']['email']}>"
+        manifest["authors"][akey] = manifest["authors"].get(akey, 0) + 1
+
+        # Output routing
+        if sharded:
+            ts = datetime.fromtimestamp(
+                meta["timestamps"]["commit"], tz=timezone.utc
+            ).astimezone()
+            fname = f"{ts.strftime('%Y.%m.%d')}-{ts.strftime('%H.%M')}-{obj['short_sha']}.json"
+            fpath = os.path.join(args.split_out, fname)
+            write_json(fpath, obj)
+            manifest["items"].append(
+                {"sha": meta["sha"], "file": fname, "subject": meta["subject"]}
+            )
+        else:
+            all_commits.append(obj)
+
+    manifest["summary"]["files_touched"] = len(files_touched_set)
+
+    if sharded:
+        os.makedirs(args.split_out, exist_ok=True)
+        write_json(os.path.join(args.split_out, "manifest.json"), manifest)
+    else:
+        out = {**manifest, "commits": all_commits}
+        if args.out == "-":
+            json.dump(out, sys.stdout, indent=2)
+            sys.stdout.write("\n")
+        else:
+            write_json(args.out, out)
+
+
+if __name__ == "__main__":
+    main()

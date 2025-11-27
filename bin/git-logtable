@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# Show commits in table format, optionally filtering by natural date ranges.
+# Example: git-logtable last friday
+
+# Use gdate if available (macOS), otherwise fallback to date
+DATEBIN=$(command -v gdate || command -v date)
+
+# If an argument is passed, parse it as a natural date for --since
+if [ "$1" ]; then
+  SINCE="$($DATEBIN -d "$*" +%Y-%m-%d 2>/dev/null)"
+  if [ $? -ne 0 ]; then
+    echo "Invalid date expression: $*"
+    exit 1
+  fi
+  RANGE="--since=$SINCE"
+else
+  RANGE=""
+fi
+
+echo "Gonna use thi"
+
+# Now run the actual git log with optional since range
+git log $RANGE --oneline \
+  --date=format:'%d/%m/%y' \
+  --pretty=format:'%h | %ad | %an | %s' |
+  column -t -s '|'
