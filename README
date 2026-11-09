@@ -8,5 +8,8 @@ https://github.com/holman/dotfiles
 
 This repo will be more like that, at some point.
 
+The current Zsh parity changes, runtime policy, and quick regression commands are
+documented in [docs/zsh-parity.md](docs/zsh-parity.md).
+
 
 # vim: set et ts=2 sw=2 tw=78 ft=markdown :
