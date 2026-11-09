@@ -2,7 +2,7 @@
 
 The portable source uses the shared Zsh repository through `.config/zsh`.
 The recorded revision contains the reviewed `cd4d12f` cleanup and the portable
-compatibility changes on `codex/ansible-6r5.3-portable` (`6ee87ed`). The portable
+compatibility changes on `codex/ansible-6r5.3-portable` (`52ef755`). The portable
 candidate is `codex/ansible-6r5.4-parity`; neither branch changes the live shell.
 
 ## Included behavior
@@ -16,6 +16,8 @@ candidate is `codex/ansible-6r5.4-parity`; neither branch changes the live shell
 - One static PATH pass discovers existing user tools on Linux and macOS, before
   plugins and mise activation. XDG_CONFIG_HOME and explicit GOPATH are respected.
   Homebrew paths and OrbStack setup are macOS-specific; ls uses platform options.
+- The msgvault wrapper resolves its external command through PATH while retaining
+  explicit MSGVAULT_BIN overrides and its existing credential workflow.
 
 `ZSH_PORTABLE_MODE` choices are `0` (full UI), `1` (lightweight UI), or `auto`
 (SSH/container/CI detection). Portable accounts default to `1`; an explicit value
@@ -66,7 +68,7 @@ contact Ansible hosts. The Ruby ABI tests use a controlled interpreter fixture.
 The shared Zsh tests exercise Linux policy branches on the current host; a native
 Linux session with the full plugin graph is separate acceptance work.
 
-The recorded checks for this candidate passed 11 portable tests and 13 shared Zsh
+The recorded checks for this candidate passed 11 portable tests and 16 shared Zsh
 tests on each interpreter pair, ShellCheck, and parsing of 39 retained Zsh sources
 under both Zsh versions. An additional 27 existing zsh-lab helper/navigation/job/
 command-supervision regressions passed per Zsh against the selected shared source.
