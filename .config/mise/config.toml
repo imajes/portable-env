@@ -14,11 +14,16 @@ idiomatic_version_file_enable_tools = []
 # idiomatic_version_file_enable_tools = ["ruby"]
 python.uv_venv_auto = true
 
-# Global, applies everywhere; the script itself no-ops outside Ruby projects
-[env]
-# _.path = [
-#   '{{ exec(command=xdg_config_home ~ "/mise/scripts/env-ruby.zsh " ~ cwd) }}',
-# ]
+# Ruby project PATH support remains opt-in in portable environments.
+# The reviewed helper is safe to enable with these two ordered env blocks;
+# transport values are base64 data, and the active Ruby installation selects ABI.
+# [[env]]
+# _MISE_RUBY_CWD_B64 = { value = '{{ cwd | b64_encode }}', tools = true }
+# _MISE_RUBY_INSTALL_B64 = { value = '{{ tools.ruby.path | default(value="") | b64_encode }}', tools = true }
+# _.source = { path = '{{ xdg_config_home }}/mise/scripts/env-ruby.bash', tools = true }
+# [[env]]
+# _MISE_RUBY_CWD_B64 = { value = false, tools = true }
+# _MISE_RUBY_INSTALL_B64 = { value = false, tools = true }
 #
 # These are literal op:// refs; nothing is fetched until you wrap a command in `op run`.
 # ANTHROPIC_API_KEY = { value = "op://Code/tdp3brwgxo4tspqhem5jxdj4j4/credential", redact = true }
