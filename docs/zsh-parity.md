@@ -3,7 +3,10 @@
 The portable source uses the shared Zsh repository through `.config/zsh`.
 The recorded revision contains the reviewed `cd4d12f` cleanup and the portable
 compatibility changes on `codex/ansible-6r5.3-portable` (`52ef755`). The portable
-candidate is `codex/ansible-6r5.4-parity`; neither branch changes the live shell.
+review branch is `codex/ansible-6r5.4-parity`. Both source branches were merged
+into local main on 2026-11-09; the shared revision is now active for new local
+shells. The review worktrees remain available. No remote push or Ansible host
+deployment was performed.
 
 ## Included behavior
 
@@ -74,6 +77,14 @@ under both Zsh versions. An additional 27 existing zsh-lab helper/navigation/job
 command-supervision regressions passed per Zsh against the selected shared source.
 This is narrower than the previous full 99-test personal lab run.
 
+After merging, the 11 portable and 16 shared tests passed again under both
+interpreter pairs. Eight cold/warm login/non-login PTY checks passed against the
+promoted live Zsh source and current installed modules, with network blocked and
+private state replaced by fixtures. They verified Homebrew Git 2.56.0, mise Ruby
+4.0.1, safe PATH and completion registration. Existing local Zim-core and mise
+completion edits were preserved byte-for-byte. Promotion receipts and backups are
+in `~/.cache/portable-parity-promotion-20261109T194026Z/`.
+
 After an eventual candidate installation, open a fresh shell and run:
 
 ```zsh
@@ -91,7 +102,8 @@ Enter and leave a versioned project and open a nested shell. Compare
 Review the shared branch against `cd4d12f` and this branch against `6503a4f` using
 `git diff --submodule=log`. Publish the shared Zsh commits before publishing a
 portable commit that references them; until then, the new gitlink is local-only.
-No push, merge, live-shell promotion or host deployment is part of this change.
+Local source promotion is complete. Remote publication and host deployment
+remain separate actions.
 
 The legacy Ansible role's destructive-update fixes and a disposable Linux deployment
 rehearsal remain deferred under `ansible-6r5.2` and `ansible-6r5.5`. The independent
