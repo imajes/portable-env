@@ -1,5 +1,8 @@
-ruby   3
-node   lts
+# Compatibility file for the existing Ansible link; keep aligned with mise.
+ruby   latest
+node   24
 golang latest
 rust   latest
 lua    latest
+python latest
+uv     latest
