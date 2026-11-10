@@ -4,3 +4,5 @@
 .tags
 .tags.log
 
+# Machine-local Claude settings
+**/.claude/settings.local.json

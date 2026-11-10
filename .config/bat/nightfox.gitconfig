@@ -1,0 +1,31 @@
+# Native delta features using official Nightfox syntax themes.
+# Select exactly one: DELTA_FEATURES=+<theme-name>.
+# Startup defaults are dayfox (light), duskfox (dark).
+
+[delta "dayfox"]
+    light = true
+    syntax-theme = dayfox
+
+[delta "dawnfox"]
+    light = true
+    syntax-theme = dawnfox
+
+[delta "duskfox"]
+    dark = true
+    syntax-theme = duskfox
+
+[delta "nightfox"]
+    dark = true
+    syntax-theme = nightfox
+
+[delta "nordfox"]
+    dark = true
+    syntax-theme = nordfox
+
+[delta "terafox"]
+    dark = true
+    syntax-theme = terafox
+
+[delta "carbonfox"]
+    dark = true
+    syntax-theme = carbonfox

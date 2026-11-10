@@ -4,9 +4,9 @@
   signingkey = 3D7D571492E8D687
 
 [core]
-  excludesfile = /Users/james/.gitignore_global
+  excludesfile = ~/.gitignore_global
   quotepath = false
-  attributesfile = /Users/james/.gitattributes
+  attributesfile = ~/.gitattributes
   pager = delta
 
 [github]
@@ -62,7 +62,7 @@
 
 [diff]
   colorMoved = default
-  color = auto
+  color = never
   rename = copy
   # tool = Kaleidoscope
 
@@ -142,3 +142,12 @@
 
 [pull]
   rebase = true
+
+[include]
+  path = ~/.config/bat/nightfox.gitconfig
+
+[init]
+  defaultBranch = main
+
+[fetch]
+  prune = true

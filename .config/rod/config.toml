@@ -1,0 +1,2 @@
+# Match the shell adapter when no terminal response is available.
+fallback_to_light = true

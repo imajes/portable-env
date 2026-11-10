@@ -1,5 +1,4 @@
 -- functions and behaviors to control color settings
-
 local wezterm = require("wezterm")
 
 -- wezterm.gui is not available to the mux server, so take care to
@@ -25,6 +24,7 @@ end
 
 -- flexoki-light colors: https://stephango.com/flexoki
 
+-- unused
 local function active_titlebar_bg(appearance)
 	if appearance:find("Dark") then
 		return "#333333"
@@ -43,6 +43,7 @@ local function active_titlebar_fg(appearance)
 	end
 end
 
+-- unused
 local function inactive_titlebar_bg(appearance)
 	if appearance:find("Dark") then
 		return "#363636"

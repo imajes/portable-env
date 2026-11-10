@@ -1,0 +1,8 @@
+AmazingPrint.defaults = {
+  indent: 2,
+  multiline: true,
+  plain: false,
+  raw: false,
+  sort_keys: true,
+  sort_vars: true,
+}

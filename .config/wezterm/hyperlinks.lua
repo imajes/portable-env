@@ -74,9 +74,9 @@ table.insert(config.hyperlink_rules, {
 
 -- Rule: match 7–40 char SHA (hex), optionally anchored by word boundaries
 -- Regex groups the SHA as $1. You could constrain to your own SHA length.
-table.insert(config.hyperlink_rules, {
-	regex = [[\b([0-9a-f]{7,40})\b]],
-	format = "https://github.com/citizenobserver/tip411-web/commit/$1",
-	highlight = 1, -- underline only the SHA
-})
+-- table.insert(config.hyperlink_rules, {
+-- 	regex = [[\b([0-9a-f]{7,40})\b]],
+-- 	format = "https://github.com/citizenobserver/tip411-web/commit/$1",
+-- 	highlight = 1, -- underline only the SHA
+-- })
 return config

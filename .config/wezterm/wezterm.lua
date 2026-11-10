@@ -9,7 +9,7 @@ local function get_appearance()
 	if wezterm.gui then
 		return wezterm.gui.get_appearance()
 	end
-	-- return "Dark"
+	return "Dark"
 end
 
 local function scheme_for_appearance(appearance)

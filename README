@@ -1,12 +1,21 @@
-fine.
+Portable shell and tool configuration, promoted deliberately from the canonical
+source configs. This is a public repository: local credentials, histories,
+machine state and entire home directories are not synchronization inputs.
 
-this is to get over a hump and it's a bunch of dotfile stuff that makes things
-clean enough to start with. But it's not what i really need in the longer
-term, which is more eloquently demonstrated here:
+`just sync` previews differences for the individual files in `sync-files.txt`.
+It is always a dry run, performs no deletions and does not copy changes. Review
+the source contents and Git diff before applying selected changes. There is no
+FOLDERS override or whole-directory copy recipe.
 
-https://github.com/holman/dotfiles
+Zsh and Neovim are separate repositories under `.config/`. Review and commit
+their source changes first, then select those commits here. A dirty submodule
+checkout is a review preview; the parent gitlink cannot record its uncommitted
+files. Publication also requires making the referenced source commits available.
 
-This repo will be more like that, at some point.
+See [docs/sync-policy.md](docs/sync-policy.md) for the public file boundary,
+intentional platform differences and the separate agent configuration review.
+The appearance assets and installation requirements are described in
+[docs/terminal-appearance.md](docs/terminal-appearance.md).
 
 The current Zsh parity changes, runtime policy, and quick regression commands are
 documented in [docs/zsh-parity.md](docs/zsh-parity.md).

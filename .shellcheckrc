@@ -1,0 +1,2 @@
+# in env files etc, these cannot be verified. just visual noise.
+disable=SC2034 # e.g. SC2034 (warning): LOG_LEVEL appears unused. Verify use (or export if used externally).

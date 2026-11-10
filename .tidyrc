@@ -1,0 +1,12 @@
+clean: yes
+drop-empty-elements: no
+indent-spaces: 2
+indent: yes
+newline: LF
+output-xhtml: no
+quiet: no
+show-warnings: yes
+tidy-mark: no
+wrap: 0
+merge-divs: yes
+merge-spans: yes
