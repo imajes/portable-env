@@ -1,12 +1,14 @@
 # Deployment integration for the reviewed source sync
 
-The legacy dotfiles role is retired from the active Ansible entrypoints. Do not
-reactivate it to deploy the new preferences. The separate native chezmoi workstream
-owns full environment deployment; the scoped terminal appearance playbook installs
-only the terminal detector, shell hooks and Fox assets for explicitly selected accounts.
+The repaired Ansible dotfiles role supports this repository layout directly. Its
+explicit `bin/lab dotfiles --limit HOST` operation updates each selected account's
+checkout in place, backs up replaced managed config, preserves runtime/auth/history
+state, and composes the terminal appearance role and per-account theme caches.
+The seven preferences below are included in its reviewed selection. A matching
+controller checkout and immutable portable source revision are required.
 
-The following newly selected preferences need these native source mappings when
-that candidate consumes this source revision:
+The native chezmoi experiment remains optional and independently owned. If that
+candidate is adopted later, these are its corresponding source mappings:
 
 | Current source | Native chezmoi source | Installed destination |
 | --- | --- | --- |
@@ -23,7 +25,7 @@ and Neovide preferences, and the reviewed zsh/Neovim source revisions. The shell
 startup fix must be included in the zsh revision. Keep the native candidate's
 source layout and profile policy; do not overlay this repository root wholesale.
 
-The native appearance asset mapping is `home/dot_config/bat` and
+For the optional migration, the native appearance asset mapping is `home/dot_config/bat` and
 `home/dot_config/rod`; Git includes `~/.config/bat/nightfox.gitconfig`. Rebuild bat
 caches as each account using a version with paired light/dark theme support.
 These files are configuration, not application installation instructions.

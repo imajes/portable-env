@@ -15,7 +15,10 @@ interactive prompt through [rod](https://github.com/leiserfg/rod). It chooses
 Bat detects the background itself. Neovim uses its native background detection
 and the same pair. Incoming `LIGHT_MODE` is no longer the source of truth.
 
-Ansible's narrow `lab_terminal_appearance` role can install the detector, shared
+Ansible's explicit dotfiles operation deploys the full reviewed configuration using
+the repaired Git/symlink role, then composes the appearance installation and caches.
+It does not require chezmoi. Its narrow `lab_terminal_appearance` role can also
+independently install the detector, shared
 shell hooks and this small file allowlist for selected Linux accounts, including
 root. SSH and `sudo su` reuse the terminal; each new interactive shell detects it
 again. No private SSH forwarding policy or sudoers changes are needed.

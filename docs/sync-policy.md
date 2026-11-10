@@ -71,6 +71,8 @@ keyring/trust state and account metadata need their separate publication review.
 Do not refresh those files from HOME. Removing tracked private material and any
 history cleanup require an explicit, separately reviewed action.
 
-The native chezmoi migration is a separate candidate. If adopted, map these files
+The repaired Ansible Git/symlink deployment consumes the current layout directly
+and preserves account state. See [deployment integration](deployment-integration.md).
+The native chezmoi migration is a separate optional candidate. If adopted, map these files
 to its `home/dot_config` and other native source paths; do not merge a second
 competing directory layout into this branch during source synchronization.
