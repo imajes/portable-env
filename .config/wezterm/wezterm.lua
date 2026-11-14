@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local fontdefs = require("fonts")
 local config = wezterm.config_builder()
+require("terminal-appearance").setup()
 local smart_tab_title = require("smart_tab_title")
 
 -- wezterm.gui is not available to the mux server, so take care to

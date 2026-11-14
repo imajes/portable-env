@@ -17,6 +17,7 @@
 .config/mdcat/config.toml
 .config/mise/scripts/env-ruby.bash
 .config/neovide/config.toml
+.config/tmux/tmux.conf
 .config/wandb/settings
 .config/wezterm/colors/cyberdream-light.lua
 .config/wezterm/colors/cyberdream-light.toml
@@ -29,6 +30,7 @@
 .config/wezterm/hyperlinks.lua
 .config/wezterm/keymaps.lua
 .config/wezterm/smart_tab_title.lua
+.config/wezterm/terminal-appearance.lua
 .default-gems
 .gemrc
 .gitignore_global
